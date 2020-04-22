@@ -8,3 +8,7 @@
 
 				print(numerator)
 				print(denominator)
+
+	if (len(sys.argv)<4):
+		print("usage: python prog4.py filename r_train r_test")
+		sys.exit(1)

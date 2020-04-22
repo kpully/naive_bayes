@@ -2,24 +2,41 @@ import pandas as pd
 import sys
 import math
 import numpy as np
+import argparse
 
 # constants
-DEBUG=True
+debug=False
+verbose=False
 
-def main(filename, r_train, r_test):
+
+def main(filename, r_train, r_test, v, d):
+	# set global variables
+	global verbose, debug
+	verbose = v
+	debug = d
+
+	# read data
 	df = pd.read_excel(filename)
+
+	# train
 	a6, lp=train(df[:r_train])
+
+	# test
 	test(df[r_train:r_test],lp)
-	verbose_output(a6)
+
+	# output
+	if verbose:
+		verbose_output(a6)
+	output()
 
 
 
 def train(data):
-	if DEBUG:
+	if debug:
 		print(data)
 	# get aggregated data
 	val_counts = dict(data["a6"].value_counts())
-	if DEBUG:
+	if debug:
 		print(val_counts)
 	# initialize data structs
 	a1,a2,a3,a4,a5,a6 = [-1]*5,[-1]*5,[-1]*5,[-1]*5,[-1]*5,[-1]*5
@@ -42,10 +59,12 @@ def train(data):
 				numerator = v+0.1
 				denominator = val_counts[c]+0.4
 				lp[c][a][val]=-1*math.log2(numerator/denominator)
-				if DEBUG:
+				if debug:
 					print("count for c=" + str(c) + " and " + a_col + "=" + str(val) + ": " + "grouped_counts[v]=" + str(v))
-			print()
-		print("<------>")
+			if debug:
+				print()
+		if debug:
+			print("<------>")
 
 
 	print(lp)
@@ -53,14 +72,14 @@ def train(data):
 
 
 def test(data, lp):
-	if DEBUG:
+	if debug:
 		print(data)
 	inferences = []
 	for i, row in data.iterrows():
 		get_inference(row[0], row[1], row[2], row[3], row[4], lp)
 
 def get_inference(a1_val, a2_val, a3_val, a4_val, a5_val, lp):
-	if DEBUG:
+	if debug:
 		print("get_inference")
 	sums = []
 	for c in range(1,4):
@@ -70,10 +89,8 @@ def get_inference(a1_val, a2_val, a3_val, a4_val, a5_val, lp):
 			+ lp[c][4][a4_val] \
 			+ lp[c][5][a5_val]
 		sums.append(s)
-	if DEBUG:
+	if debug:
 		print(sums)
-
-
 
 
 def verbose_output(a6):
@@ -82,11 +99,20 @@ def verbose_output(a6):
 	for c in range(1,len(a6)-1):
 		print(s1.format(c=c, val_count=a6[c]))
 
+
 def output():
 	s="Accuracy=%.2f. Precision=%.2f. Recall=%.2d"
+	print(s)
+
 
 if __name__=="__main__":
-	if (len(sys.argv)<4):
-		print("usage: python prog4.py filename r_train r_test")
-		sys.exit(1)
-	main(sys.argv[1], int(sys.argv[2]), int(sys.argv[3]))
+	parser = argparse.ArgumentParser(description='Naive Bayes')
+	parser.add_argument('-v', help='verbose output', action='store_true')
+	parser.add_argument('-d', help='debug mode', action='store_true')
+	parser.add_argument("filename", help="file containing data")
+	parser.add_argument("r_train", help="number of rows for training")
+	parser.add_argument("r_test", help="number of rows for testing")
+
+	args = parser.parse_args()
+
+	main(sys.argv[1], int(sys.argv[2]), int(sys.argv[3]), args.v, args.d)
