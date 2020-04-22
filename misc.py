@@ -12,3 +12,7 @@
 	if (len(sys.argv)<4):
 		print("usage: python prog4.py filename r_train r_test")
 		sys.exit(1)
+
+		if debug:
+			print("lst[%d]=%d" % (i, lst[i]))
+			print("max_vals[0]=%d" % max_vals[0])

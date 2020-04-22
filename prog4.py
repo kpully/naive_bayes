@@ -3,6 +3,7 @@ import sys
 import math
 import numpy as np
 import argparse
+import random
 
 # constants
 debug=False
@@ -75,7 +76,10 @@ def test(data, lp):
 		print(data)
 	inferences = []
 	for i, row in data.iterrows():
-		get_inference(row[0], row[1], row[2], row[3], row[4], lp)
+		inference = get_inference(row[0], row[1], row[2], row[3], row[4], lp) + 1
+		inferences.append(inference)
+	if debug:
+		print(inferences)
 
 
 def get_inference(a1_val, a2_val, a3_val, a4_val, a5_val, lp):
@@ -91,6 +95,30 @@ def get_inference(a1_val, a2_val, a3_val, a4_val, a5_val, lp):
 		sums.append(s)
 	if debug:
 		print(sums)
+	return get_max_index(sums)
+
+
+def get_max_index(lst):
+	"""
+	Get max value of lst
+	Break ties arbitrarily
+	"""
+	max_vals=[lst[0]]
+	max_is=[0]
+	for i in range(1,len(lst)):
+		if (lst[i]>max_vals[0]):
+			print("update max")
+			max_vals=[lst[i]]
+			max_is=[i]
+			print("max_vals[0]=%d" % max_vals[0])
+		elif (lst[i]==max_vals[0]):
+			max_vals.append(lst[i])
+			max_is.append(i)
+	i = random.randint(0,len(max_vals)-1)
+	max_i=max_is[i]
+	if debug:
+		print("max_i=%d" % max_i)
+	return max_i
 
 
 def verbose_output(a6):
