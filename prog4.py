@@ -80,11 +80,10 @@ def test(data, lp):
 		inferences.append(inference)
 	if debug:
 		print(inferences)
+	evaluate_model
 
 
 def get_inference(a1_val, a2_val, a3_val, a4_val, a5_val, lp):
-	if debug:
-		print("get_inference")
 	sums = []
 	for c in range(1,4):
 		s = lp[c][1][a1_val] \
@@ -98,6 +97,10 @@ def get_inference(a1_val, a2_val, a3_val, a4_val, a5_val, lp):
 	return get_max_index(sums)
 
 
+def evaluate_model():
+	return
+
+
 def get_max_index(lst):
 	"""
 	Get max value of lst
@@ -107,10 +110,8 @@ def get_max_index(lst):
 	max_is=[0]
 	for i in range(1,len(lst)):
 		if (lst[i]>max_vals[0]):
-			print("update max")
 			max_vals=[lst[i]]
 			max_is=[i]
-			print("max_vals[0]=%d" % max_vals[0])
 		elif (lst[i]==max_vals[0]):
 			max_vals.append(lst[i])
 			max_is.append(i)
@@ -122,10 +123,11 @@ def get_max_index(lst):
 
 
 def verbose_output(a6):
-	s1 = "lp(X.a6={c})={val_count}"
+	s1 = "lp(X.a6={c})={val_count:.4f}"
 	s2 = "lp(X.a%d=%d|X.a6=%d)"
 	for c in range(1,len(a6)-1):
-		print(s1.format(c=c, val_count=a6[c]))
+		print(s1.format(c=c, val_count=a6[c]), end = '\t')
+	print()
 
 
 def output():

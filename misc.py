@@ -16,3 +16,4 @@
 		if debug:
 			print("lst[%d]=%d" % (i, lst[i]))
 			print("max_vals[0]=%d" % max_vals[0])
+print("max_vals[0]=%d" % max_vals[0])
