@@ -22,13 +22,12 @@ def main(filename, r_train, r_test, v, d):
 	a6, lp=train(df[:r_train])
 
 	# test
-	test(df[r_train:r_test],lp)
+	test(df[r_train:r_train+r_test],lp)
 
 	# output
 	if verbose:
 		verbose_output(a6)
 	output()
-
 
 
 def train(data):
@@ -59,12 +58,12 @@ def train(data):
 				numerator = v+0.1
 				denominator = val_counts[c]+0.4
 				lp[c][a][val]=-1*math.log2(numerator/denominator)
-				if debug:
-					print("count for c=" + str(c) + " and " + a_col + "=" + str(val) + ": " + "grouped_counts[v]=" + str(v))
-			if debug:
-				print()
-		if debug:
-			print("<------>")
+				# if debug:
+				# 	print("count for c=" + str(c) + " and " + a_col + "=" + str(val) + ": " + "grouped_counts[v]=" + str(v))
+		# 	if debug:
+		# 		print()
+		# if debug:
+		# 	print("<------>")
 
 
 	print(lp)
@@ -77,6 +76,7 @@ def test(data, lp):
 	inferences = []
 	for i, row in data.iterrows():
 		get_inference(row[0], row[1], row[2], row[3], row[4], lp)
+
 
 def get_inference(a1_val, a2_val, a3_val, a4_val, a5_val, lp):
 	if debug:
