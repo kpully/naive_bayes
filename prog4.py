@@ -27,7 +27,7 @@ def main(filename, r_train, r_test, v, d):
 
 	# output
 	if verbose:
-		verbose_output(a6)
+		verbose_output(a6, lp)
 	output()
 
 
@@ -39,14 +39,17 @@ def train(data):
 	if debug:
 		print(val_counts)
 	# initialize data structs
-	a1,a2,a3,a4,a5,a6 = [-1]*5,[-1]*5,[-1]*5,[-1]*5,[-1]*5,[-1]*5
+	a1,a2,a3,a4,a5 = [-1]*5,[-1]*5,[-1]*5,[-1]*5,[-1]*5
+	a6=[-1]*4
 	lp=np.zeros((4,6,5))
-	# print(lp)
 
-	for c in val_counts.keys():
-		numerator=val_counts[c]+0.1
+	for c in range(1,4):
+		val_counts_c = val_counts[c] if c in val_counts.keys() else 0
+		numerator=val_counts_c+0.1
 		denominator=len(data)+0.3
 		a6[c]=-1*math.log2(numerator/denominator)
+
+	for c in range(1,4):
 		data_=data[data.a6==c]
 		for a in range(1,6):
 			a_col="a"+str(a)
@@ -56,18 +59,12 @@ def train(data):
 					v = grouped_counts[val]
 				else:
 					v=0
+				val_counts_c = val_counts[c] if c in val_counts.keys() else 0
 				numerator = v+0.1
-				denominator = val_counts[c]+0.4
+				denominator = val_counts_c+0.4
 				lp[c][a][val]=-1*math.log2(numerator/denominator)
-				# if debug:
-				# 	print("count for c=" + str(c) + " and " + a_col + "=" + str(val) + ": " + "grouped_counts[v]=" + str(v))
-		# 	if debug:
-		# 		print()
-		# if debug:
-		# 	print("<------>")
-
-
-	print(lp)
+	if debug:
+		print(lp)
 	return a6, lp
 
 
@@ -80,7 +77,7 @@ def test(data, lp):
 		inferences.append(inference)
 	if debug:
 		print(inferences)
-	evaluate_model
+	accuracy = evaluate_model(inferences, data["a6"])
 
 
 def get_inference(a1_val, a2_val, a3_val, a4_val, a5_val, lp):
@@ -97,8 +94,13 @@ def get_inference(a1_val, a2_val, a3_val, a4_val, a5_val, lp):
 	return get_max_index(sums)
 
 
-def evaluate_model():
-	return
+def evaluate_model(guesses, correct):
+	print(guesses)
+	print(correct)
+	a = [i for i, j in zip(guesses, correct) if i == j]
+	accuracy=len(a)/len(guesses)
+	print(accuracy)
+	return 0.0
 
 
 def get_max_index(lst):
@@ -117,16 +119,26 @@ def get_max_index(lst):
 			max_is.append(i)
 	i = random.randint(0,len(max_vals)-1)
 	max_i=max_is[i]
-	if debug:
-		print("max_i=%d" % max_i)
 	return max_i
 
 
-def verbose_output(a6):
+def verbose_output(a6, lp):
+	# format string skeletongs
 	s1 = "lp(X.a6={c})={val_count:.4f}"
-	s2 = "lp(X.a%d=%d|X.a6=%d)"
-	for c in range(1,len(a6)-1):
+	s2 = "{lp_:.4f}"
+
+	# loop and print results
+	for c in range(1,4):
 		print(s1.format(c=c, val_count=a6[c]), end = '\t')
+	print()
+	print()
+	for a in range(1,6):
+		for c in range(1,4):
+			for a_val in range(1,5):
+				# print(s2.format(a=a, a_val=a_val, c=c), end = '\t')
+				print(s2.format(lp_=lp[c][a][a_val]), end='\t')
+			print()
+		print()
 	print()
 
 
