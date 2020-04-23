@@ -26,3 +26,5 @@ print("max_vals[0]=%d" % max_vals[0])
 		# 		print()
 		# if debug:
 		# 	print("<------>")
+
+	guesses_3=[x for x in guesses if x==3]

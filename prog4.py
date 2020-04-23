@@ -20,15 +20,15 @@ def main(filename, r_train, r_test, v, d):
 	df = pd.read_excel(filename)
 
 	# train
-	a6, lp=train(df[:r_train])
+	a6, lp = train(df[:r_train])
 
 	# test
-	test(df[r_train:r_train+r_test],lp)
+	accuracy, precision = test(df[r_train:r_train+r_test],lp, a6)
 
 	# output
 	if verbose:
 		verbose_output(a6, lp)
-	output()
+	output(accuracy, precision)
 
 
 def train(data):
@@ -68,58 +68,84 @@ def train(data):
 	return a6, lp
 
 
-def test(data, lp):
+def test(data, lp, a6):
 	if debug:
 		print(data)
 	inferences = []
 	for i, row in data.iterrows():
-		inference = get_inference(row[0], row[1], row[2], row[3], row[4], lp) + 1
+		inference = get_inference(row[0], row[1], row[2], row[3], row[4], lp,a6) + 1
 		inferences.append(inference)
 	if debug:
 		print(inferences)
 	accuracy = evaluate_model(inferences, data["a6"])
+	return accuracy
 
 
-def get_inference(a1_val, a2_val, a3_val, a4_val, a5_val, lp):
+def get_inference(a1_val, a2_val, a3_val, a4_val, a5_val, lp, a6):
 	sums = []
 	for c in range(1,4):
+		if debug:
+			print("a1_val=" + str(a1_val))
+			print(lp[c][1][a1_val])
+			print("a2_val=" + str(a2_val))
+			print(lp[c][2][a2_val])
+			print("a3_val=" + str(a3_val))
+			print(lp[c][3][a3_val])
+			print("a4_val=" + str(a4_val))
+			print(lp[c][4][a4_val])
+			print("a5_val=" + str(a5_val))
+			print(lp[c][5][a5_val])
 		s = lp[c][1][a1_val] \
 			+ lp[c][2][a2_val] \
 			+ lp[c][3][a3_val] \
 			+ lp[c][4][a4_val] \
-			+ lp[c][5][a5_val]
+			+ lp[c][5][a5_val] \
+			+ a6[c]
 		sums.append(s)
 	if debug:
 		print(sums)
-	return get_max_index(sums)
+	return get_min_index(sums)
 
 
 def evaluate_model(guesses, correct):
-	print(guesses)
-	print(correct)
-	a = [i for i, j in zip(guesses, correct) if i == j]
-	accuracy=len(a)/len(guesses)
-	print(accuracy)
-	return 0.0
+	zipped=list(zip(guesses,correct))
+	a=0
+	p_truepos = 0
+	p_falsepos = 0
+	if debug:
+		print(zipped)
+	for i in range(len(zipped)):
+		pair = zipped[i]
+		if (pair[0]==pair[1]):
+			a+=1
+		if (pair[0]==3):
+			if (pair[1]==3):
+				p_truepos+=1
+			else:
+				p_falsepos+=1
+
+	accuracy=a/len(zipped)
+	precision=p_truepos/(p_truepos+p_falsepos)
+	return accuracy, precision
 
 
-def get_max_index(lst):
+def get_min_index(lst):
 	"""
 	Get max value of lst
 	Break ties arbitrarily
 	"""
-	max_vals=[lst[0]]
-	max_is=[0]
+	min_vals=[lst[0]]
+	min_is=[0]
 	for i in range(1,len(lst)):
-		if (lst[i]>max_vals[0]):
-			max_vals=[lst[i]]
-			max_is=[i]
-		elif (lst[i]==max_vals[0]):
-			max_vals.append(lst[i])
-			max_is.append(i)
-	i = random.randint(0,len(max_vals)-1)
-	max_i=max_is[i]
-	return max_i
+		if (lst[i]<min_vals[0]):
+			min_vals=[lst[i]]
+			min_is=[i]
+		elif (lst[i]==min_vals[0]):
+			min_vals.append(lst[i])
+			min_is.append(i)
+	i = random.randint(0,len(min_vals)-1)
+	min_i=min_is[i]
+	return min_i
 
 
 def verbose_output(a6, lp):
@@ -142,9 +168,9 @@ def verbose_output(a6, lp):
 	print()
 
 
-def output():
-	s="Accuracy=%.2f. Precision=%.2f. Recall=%.2d"
-	print(s)
+def output(accuracy, precision):
+	s="Accuracy={accuracy:.4f}. Precision={precision:.4f}. Recall=%.2d"
+	print(s.format(accuracy=accuracy, precision=precision))
 
 
 if __name__=="__main__":
