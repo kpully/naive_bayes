@@ -28,3 +28,14 @@ print("max_vals[0]=%d" % max_vals[0])
 		# 	print("<------>")
 
 	guesses_3=[x for x in guesses if x==3]
+		if debug:
+			print("a1_val=" + str(a1_val))
+			print(lp[c][1][a1_val])
+			print("a2_val=" + str(a2_val))
+			print(lp[c][2][a2_val])
+			print("a3_val=" + str(a3_val))
+			print(lp[c][3][a3_val])
+			print("a4_val=" + str(a4_val))
+			print(lp[c][4][a4_val])
+			print("a5_val=" + str(a5_val))
+			print(lp[c][5][a5_val])

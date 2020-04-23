@@ -23,12 +23,12 @@ def main(filename, r_train, r_test, v, d):
 	a6, lp = train(df[:r_train])
 
 	# test
-	accuracy, precision = test(df[r_train:r_train+r_test],lp, a6)
+	accuracy, precision, recall = test(df[r_train:r_train+r_test],lp, a6)
 
 	# output
 	if verbose:
 		verbose_output(a6, lp)
-	output(accuracy, precision)
+	output(accuracy, precision, recall)
 
 
 def train(data):
@@ -84,17 +84,6 @@ def test(data, lp, a6):
 def get_inference(a1_val, a2_val, a3_val, a4_val, a5_val, lp, a6):
 	sums = []
 	for c in range(1,4):
-		if debug:
-			print("a1_val=" + str(a1_val))
-			print(lp[c][1][a1_val])
-			print("a2_val=" + str(a2_val))
-			print(lp[c][2][a2_val])
-			print("a3_val=" + str(a3_val))
-			print(lp[c][3][a3_val])
-			print("a4_val=" + str(a4_val))
-			print(lp[c][4][a4_val])
-			print("a5_val=" + str(a5_val))
-			print(lp[c][5][a5_val])
 		s = lp[c][1][a1_val] \
 			+ lp[c][2][a2_val] \
 			+ lp[c][3][a3_val] \
@@ -110,23 +99,25 @@ def get_inference(a1_val, a2_val, a3_val, a4_val, a5_val, lp, a6):
 def evaluate_model(guesses, correct):
 	zipped=list(zip(guesses,correct))
 	a=0
-	p_truepos = 0
-	p_falsepos = 0
+	true_pos, false_pos, false_neg = 0, 0, 0
 	if debug:
 		print(zipped)
+	# loop through results to calculate evaluation metrics
 	for i in range(len(zipped)):
 		pair = zipped[i]
 		if (pair[0]==pair[1]):
-			a+=1
-		if (pair[0]==3):
-			if (pair[1]==3):
-				p_truepos+=1
-			else:
-				p_falsepos+=1
+			a += 1
+		if (pair[0]==3 and pair[1]==3):
+			true_pos += 1
+		elif (pair[0]==3 and pair[1]!=3):
+			false_pos += 1
+		elif (pair[0]!=3 and pair[1]==3):
+			false_neg +=1
 
 	accuracy=a/len(zipped)
-	precision=p_truepos/(p_truepos+p_falsepos)
-	return accuracy, precision
+	precision=true_pos/(true_pos+false_pos)
+	recall = true_pos/(true_pos+false_neg)
+	return accuracy, precision, recall
 
 
 def get_min_index(lst):
@@ -150,12 +141,12 @@ def get_min_index(lst):
 
 def verbose_output(a6, lp):
 	# format string skeletongs
-	s1 = "lp(X.a6={c})={val_count:.4f}"
+	s1 = "{val_count:.4f}"
 	s2 = "{lp_:.4f}"
 
 	# loop and print results
 	for c in range(1,4):
-		print(s1.format(c=c, val_count=a6[c]), end = '\t')
+		print(s1.format(val_count=a6[c]), end = '\t')
 	print()
 	print()
 	for a in range(1,6):
@@ -168,9 +159,9 @@ def verbose_output(a6, lp):
 	print()
 
 
-def output(accuracy, precision):
-	s="Accuracy={accuracy:.4f}. Precision={precision:.4f}. Recall=%.2d"
-	print(s.format(accuracy=accuracy, precision=precision))
+def output(accuracy, precision, recall):
+	s="Accuracy={accuracy:.4f}. Precision={precision:.4f}. Recall={recall:.4f}"
+	print(s.format(accuracy=accuracy, precision=precision, recall=recall))
 
 
 if __name__=="__main__":
