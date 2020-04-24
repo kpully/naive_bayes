@@ -23,7 +23,7 @@ def main(filename, r_train, r_test, v, d):
 	a6, lp = train(df[:r_train])
 
 	# test
-	accuracy, precision, recall = test(df[r_train:r_train+r_test],lp, a6)
+	accuracy, precision, recall = test(df.tail(r_test),lp, a6)
 
 	# output
 	if verbose:
@@ -115,8 +115,14 @@ def evaluate_model(guesses, correct):
 			false_neg +=1
 
 	accuracy=a/len(zipped)
-	precision=true_pos/(true_pos+false_pos)
-	recall = true_pos/(true_pos+false_neg)
+	if (true_pos+false_pos==0):
+		precision=0
+	else:
+		precision=true_pos/(true_pos+false_pos) #true_pos=c union q, true_pos+false_pos=q
+	if (true_pos+false_neg==0):
+		recall=0
+	else:
+		recall = true_pos/(true_pos+false_neg)
 	return accuracy, precision, recall
 
 
