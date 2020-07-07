@@ -1,4 +1,1 @@
-# prog4
-
-## TODO
-- for precision - print out 0/0
+# Naive Bayes from scratch
